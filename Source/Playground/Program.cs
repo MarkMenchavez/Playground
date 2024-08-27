@@ -1,12 +1,14 @@
+using Playground;
+
 using Serilog;
 
 Log.Logger = SerilogExtensions.CreateBootstrapLogger();
 
-try 
+try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    builder.Host.UseDefaultServiceProvider(options => 
+    builder.Host.UseDefaultServiceProvider(options =>
     {
         options.ValidateOnBuild = true;
         options.ValidateScopes = true;
@@ -14,7 +16,7 @@ try
 
     builder.Host.UseSerilog();
 
-    builder.WebHost.ConfigureKestrel(options => 
+    builder.WebHost.ConfigureKestrel(options =>
     {
         // TODO Configure server limits.
         options.AddServerHeader = false;
