@@ -186,6 +186,23 @@ csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = true
 
 #### Naming styles ####
+
+# SA0001: Xml Comment Analysis Disabled
+dotnet_diagnostic.SA0001.severity = none
+
+# SA1101: Prefix local calls with this
+dotnet_diagnostic.SA1101.severity = silent
+
+# SA1402: File may only contain a single type
+dotnet_diagnostic.SA1402.severity = silent
+# SA1413: Use trailing comma in multi-line initializers
+dotnet_diagnostic.SA1413.severity = silent
+
+# SA1600: Elements should be documented
+dotnet_diagnostic.SA1600.severity = silent
+# SA1633: File should have header
+dotnet_diagnostic.SA1633.severity = none
+
 [*.{cs,vb}]
 
 # Naming rules
