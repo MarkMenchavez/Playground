@@ -1,37 +1,20 @@
 # Playground
 
-## Solution Files
 
-`.gitignore`
+Playground is a reference implementation of cloud native microservice architecture using .NET technologies.
 
-The .gitignore file specifies intentionally untracked files that Git should ignore.
-This helps to keep the repository clean and reduces the amount of noise when viewing changes.
+## Overview
+This project demonstrates a modern cloud-native microservice architecture built with .NET technologies. It includes all essential components for a production-ready microservices system.
 
-`.editorconfig`
+## Projects
+The solution contains the following key components:
 
-The .editorconfig file defines the coding styles and preferences for editors and IDEs.
+* **API Host**: A lightweight HTTP server that serves as the entry point for all requests.  
+* **Worker Host**: A background service that runs in the background, handling long-running processes.
+* **Infrastructure**: A shared library containing common utilities and services used by both the API Host and Worker Host.
+* **Unit Tests**: Automated tests for individual units of code to ensure correctness.
+* **Integration Tests**: Tests that verify interactions between different components of the system.
+* **Performance Tests**: Tests that measure the system's performance under various load conditions.
 
-`global.json`
-
-The global.json file is used to specifiy the version of .NET SDK that should be used for building and running projects.
-
-`nuget.config`
-
-The nuget.config file is used to configure NuGet package sources.
-
-`Directory.Build.props`
-
-The Directory.Build.props file is used to customize MSBuild properties for all projects in the current directory and its subdirectories.
-
-`Playground.sln`
-
-The sln file defines the structure of the solution and contains information about its components such as projects, build configurations, and other settings.
-
-`LICENSE`
-
-The LICENSE file specifies the terms under which the software and associated documentation files are made available.
-
-`README.md`
-
-The README.md file offers a high-level overview of the solution files in the project.
-It provides brief descriptions, helping users understand the purpose and function of each component in the projects.
+## Technologies
+* .NET 10
