@@ -1,5 +1,11 @@
 # Playground
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=MarkMenchavez_Playground&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=MarkMenchavez_Playground)
+
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=MarkMenchavez_Playground&metric=bugs)](https://sonarcloud.io/summary/new_code?id=MarkMenchavez_Playground)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=MarkMenchavez_Playground&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=MarkMenchavez_Playground)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=MarkMenchavez_Playground&metric=coverage)](https://sonarcloud.io/summary/new_code?id=MarkMenchavez_Playground)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=MarkMenchavez_Playground&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=MarkMenchavez_Playground)
 
 Playground is a reference implementation of cloud native microservice architecture using .NET technologies.
 
