@@ -112,6 +112,11 @@ internal class WeatherForecastService(
 
     public async Task<IEnumerable<WeatherForecast>> GetForecastsAsync(int days, CancellationToken cancellationToken = default)
     {
+        if (days <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(days), "Days must be greater than zero.");
+        }
+
         var summaries = serviceOptions.Summaries;
 
         var forecasts = new List<WeatherForecast>();

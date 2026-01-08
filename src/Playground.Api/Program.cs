@@ -10,7 +10,7 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     builder.Logging.ClearProviders();
-    builder.Logging.AddConsole();
+    builder.Host.UseSerilogLogging();
 
     // Add services to the container.
     // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -25,8 +25,8 @@ try
         app.MapOpenApi();
     }
 
-    app.UseHsts();
-    app.UseHttpsRedirection();
+    ////app.UseHsts();
+    ////app.UseHttpsRedirection();
 
     app.MapWeatherForecast();
 

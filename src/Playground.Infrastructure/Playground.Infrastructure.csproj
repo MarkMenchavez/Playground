@@ -7,5 +7,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Serilog.AspnetCore" />
+    <PackageReference Include="Serilog.Exceptions" />
+    <PackageReference Include="Serilog.Sinks.Async" />
+    <PackageReference Include="Serilog.Sinks.Console" />
   </ItemGroup>
 </Project>
