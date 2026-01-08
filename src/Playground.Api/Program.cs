@@ -25,6 +25,8 @@ try
         app.MapOpenApi();
     }
 
+    app.UseSerilogRequestLogging();
+
     ////app.UseHsts();
     ////app.UseHttpsRedirection();
 

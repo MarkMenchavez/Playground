@@ -87,7 +87,7 @@ internal static partial class WeatherForecastLogger
 
 internal class WeatherForecastServiceOptions
 {
-    public int DefaultDays { get; set; }
+    public int DefaultDays { get; set; } = 7;
 
     public string[] Summaries { get; set; } = [];
 
