@@ -200,8 +200,12 @@ dotnet_diagnostic.SA1413.severity = silent
 
 # SA1600: Elements should be documented
 dotnet_diagnostic.SA1600.severity = silent
+# SA1601: Partial elements should be documented
+dotnet_diagnostic.SA1601.severity = silent
 # SA1633: File should have header
 dotnet_diagnostic.SA1633.severity = none
+# SA1649: File name should match first type name
+dotnet_diagnostic.SA1649.severity = silent
 
 [*.{cs,vb}]
 
@@ -378,7 +382,7 @@ dotnet_naming_style.tpascalcase.required_suffix =
 dotnet_naming_style.tpascalcase.word_separator = 
 dotnet_naming_style.tpascalcase.capitalization = pascal_case
 
-dotnet_naming_style._camelcase.required_prefix = _
+dotnet_naming_style._camelcase.required_prefix = 
 dotnet_naming_style._camelcase.required_suffix = 
 dotnet_naming_style._camelcase.word_separator = 
 dotnet_naming_style._camelcase.capitalization = camel_case
