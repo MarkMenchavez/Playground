@@ -1,34 +1,20 @@
-using Microsoft.AspNetCore.Builder;
 using Playground.Api;
 using Playground.Infrastructure;
+
 using Serilog;
 
 Log.Logger = SerilogExtensions.CreateBootstrapLogger();
 
 try
 {
-    var builder = WebApplication.CreateBuilder(args);
+    var builder = WebApplication
+        .CreateBuilder(args)
+        .Initialize();
 
-    builder.Logging.ClearProviders();
-    builder.Host.UseSerilogLogging();
-
-    // Add services to the container.
-    // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-    builder.Services.AddOpenApi();
     builder.Services.AddWeatherForecast(builder.Configuration);
 
-    var app = builder.Build();
-
-    // Configure the HTTP request pipeline.
-    if (app.Environment.IsDevelopment())
-    {
-        app.MapOpenApi();
-    }
-
-    app.UseSerilogRequestLogging();
-
-    ////app.UseHsts();
-    ////app.UseHttpsRedirection();
+    var app = builder.Build()
+        .InitializePipeline();
 
     app.MapWeatherForecast();
 

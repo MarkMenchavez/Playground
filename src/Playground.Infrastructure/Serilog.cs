@@ -18,7 +18,7 @@ public static class SerilogExtensions
     }
 }
 
-public static class HostingBuilderExtensions
+internal static class HostBuilderExtensions
 {
     public static IHostBuilder UseSerilogLogging(this IHostBuilder hostBuilder)
     {

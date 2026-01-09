@@ -1,3 +1,5 @@
+using Asp.Versioning;
+
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
@@ -60,9 +62,19 @@ internal static class EndpointRouteBuilderExtensions
 {
     public static IEndpointRouteBuilder MapWeatherForecast(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/weatherforecast", async (IWeatherForecastService service, CancellationToken cancellationToken)
+        var versionSet = app.NewApiVersionSet()
+            .HasApiVersion(new ApiVersion(1, 0))
+            .ReportApiVersions()
+            .Build();
+
+        var group = app.MapGroup("/api/v{version:apiversion}/weatherforecast")
+            .WithApiVersionSet(versionSet)
+            .WithTags("Weather Forecast");
+
+        group.MapGet(string.Empty, async (IWeatherForecastService service, CancellationToken cancellationToken)
                 => TypedResults.Ok(await service.GetForecastsAsync(cancellationToken)))
             .WithName("GetWeatherForecast")
+            .MapToApiVersion(1.0)
             .AddOpenApiOperationTransformer((operation, context, cancelalationToken) =>
             {
                 operation.Summary = "Gets the weather forecast for the default number of days.";
