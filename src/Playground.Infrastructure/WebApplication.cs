@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -14,7 +15,7 @@ public static class WebApplicationBuilderExtensions
     {
         builder.Host.ConfigureServiceProvider();
         builder.WebHost.ConfigureKestrelServer(builder.Configuration);
-        builder.ConfigureLogging();
+        builder.ConfigureLogging(builder.Configuration);
 
         builder.Services.AddVersionedOpenApi();
 
@@ -39,10 +40,15 @@ public static class WebApplicationBuilderExtensions
         });
     }
 
-    private static void ConfigureLogging(this WebApplicationBuilder builder)
+    private static void ConfigureLogging(this WebApplicationBuilder builder, IConfiguration configuration)
     {
         builder.Logging.ClearProviders();
         builder.Host.UseSerilogLogging();
+        builder.Services.AddHttpLogging(options =>
+        {
+            configuration.GetSection("HttpLogging").Bind(options);
+            options.CombineLogs = true;
+        });
     }
 }
 
@@ -53,6 +59,7 @@ public static class WebApplicationExtensions
         app.MapScalarOpenApi();
 
         app.UseSerilogRequestLogging();
+        app.UseHttpLogging();
 
         ////app.UseHsts();
         ////app.UseHttpsRedirection();

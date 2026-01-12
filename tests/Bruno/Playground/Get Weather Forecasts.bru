@@ -10,6 +10,10 @@ get {
   auth: inherit
 }
 
+headers {
+  x-Correlation-Id: bruno-{{$guid}}
+}
+
 settings {
   encodeUrl: true
   timeout: 3000
