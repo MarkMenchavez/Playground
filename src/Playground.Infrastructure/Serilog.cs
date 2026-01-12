@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using Serilog;
@@ -22,6 +23,11 @@ internal static class HostBuilderExtensions
 {
     public static IHostBuilder UseSerilogLogging(this IHostBuilder hostBuilder)
     {
+        hostBuilder.ConfigureServices(services =>
+        {
+            services.AddHttpContextAccessor();
+        });
+
         return hostBuilder.UseSerilog(
             configureLogger: (context, services, configuration) =>
                 configuration
@@ -31,7 +37,8 @@ internal static class HostBuilderExtensions
                     .Enrich.With<ShortSourceContextEnricher>()
                     .Enrich.WithExceptionDetails()
                     .Enrich.WithProperty("Application", context.HostingEnvironment.ApplicationName)
-                    .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName),
+                    .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName)
+                    .Enrich.WithCorrelationId(addValueIfHeaderAbsence: true),
             writeToProviders: true);
     }
 }
