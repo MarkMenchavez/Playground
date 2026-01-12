@@ -63,22 +63,38 @@ internal static class EndpointRouteBuilderExtensions
     public static IEndpointRouteBuilder MapWeatherForecast(this IEndpointRouteBuilder app)
     {
         var versionSet = app.NewApiVersionSet()
-            .HasApiVersion(new ApiVersion(1, 0))
+            .HasDeprecatedApiVersion(new ApiVersion(1, 0))
+            .HasApiVersion(new ApiVersion(2, 0))
             .ReportApiVersions()
             .Build();
 
-        var group = app.MapGroup("/api/v{version:apiversion}/weatherforecast")
+        var groupV1 = app.MapGroup("/api/v{version:apiversion}")
             .WithApiVersionSet(versionSet)
-            .WithTags("Weather Forecast");
+            .HasApiVersion(1.0);
 
-        group.MapGet(string.Empty, async (IWeatherForecastService service, CancellationToken cancellationToken)
+        groupV1.MapGet("weatherforecast", async (IWeatherForecastService service, CancellationToken cancellationToken)
                 => TypedResults.Ok(await service.GetForecastsAsync(cancellationToken)))
-            .WithName("GetWeatherForecast")
             .MapToApiVersion(1.0)
-            .AddOpenApiOperationTransformer((operation, context, cancelalationToken) =>
+            .AddOpenApiOperationTransformer((operation, context, cancellationToken) =>
             {
+                operation.Deprecated = true;
                 operation.Summary = "Gets the weather forecast for the default number of days.";
                 operation.Description = "Retrieves an array of weather forecast data for the default number of days configured in the service.";
+
+                return Task.CompletedTask;
+            });
+
+        var groupV2 = app.MapGroup("/api/v{version:apiversion}")
+            .WithApiVersionSet(versionSet)
+            .HasApiVersion(2.0);
+
+        groupV2.MapGet("weatherforecast", async (int days, IWeatherForecastService service, CancellationToken cancellationToken)
+                => TypedResults.Ok(await service.GetForecastsAsync(days, cancellationToken)))
+            .MapToApiVersion(2.0)
+            .AddOpenApiOperationTransformer((operation, context, cancellationToken) =>
+            {
+                operation.Summary = "Gets the weather forecast for the specified number of days.";
+                operation.Description = "Retrieves an array of weather forecast data for the specified number of days.";
 
                 return Task.CompletedTask;
             });

@@ -1,0 +1,26 @@
+meta {
+  name: Get Weather Forecasts V2
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{BaseUri}}/api/v2/weatherforecast?days=7
+  body: none
+  auth: inherit
+}
+
+params:query {
+  days: 7
+}
+
+headers {
+  x-correlation-id: bruno-{{$guid}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 3000
+  followRedirects: true
+  maxRedirects: 5
+}
