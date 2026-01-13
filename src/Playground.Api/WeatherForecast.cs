@@ -1,3 +1,5 @@
+#pragma warning disable MA0048 // File name must match type name
+
 using Asp.Versioning;
 
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -160,7 +162,7 @@ internal class WeatherForecastService(
         {
             await Task.Delay(serviceOptions.GenerationDelayMilliseconds, linkedTokenSource.Token);
             forecasts.Add(new WeatherForecast(
-                DateOnly.FromDateTime(DateTime.Now.AddDays(index - 1)),
+                DateOnly.FromDateTime(DateTime.UtcNow.AddDays(index - 1)),
                 Random.Shared.Next(serviceOptions.MinimumTemperatureCelsius, serviceOptions.MaximumTemperatureCelsius),
                 summaries[Random.Shared.Next(summaries.Length)]));
         }

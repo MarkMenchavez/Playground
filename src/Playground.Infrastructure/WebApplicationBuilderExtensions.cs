@@ -6,8 +6,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
 
-using Serilog;
-
 namespace Playground.Infrastructure;
 
 public static class WebApplicationBuilderExtensions
@@ -54,23 +52,5 @@ public static class WebApplicationBuilderExtensions
             configuration.GetSection("HttpLogging").Bind(options);
             options.CombineLogs = true;
         });
-    }
-}
-
-public static class WebApplicationExtensions
-{
-    public static WebApplication InitializePipeline(this WebApplication app)
-    {
-        app.MapScalarOpenApi();
-
-        app.UseSerilogRequestLogging();
-        app.UseHttpLogging();
-
-        app.UseExceptionHandler();
-
-        ////app.UseHsts();
-        ////app.UseHttpsRedirection();
-
-        return app;
     }
 }

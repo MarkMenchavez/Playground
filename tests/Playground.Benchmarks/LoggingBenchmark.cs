@@ -97,6 +97,7 @@ public class LoggingBenchmark
 #pragma warning restore S2629 // Logging templates should be constant
 }
 
+#pragma warning disable MA0048 // File name must match type name
 internal static partial class LoggingBenchmarkExtensions
 {
     [LoggerMessage(Level = LogLevel.Debug, Message = "The {QuickAnimal} jumps over the {LazyAnimal}")]
@@ -105,3 +106,4 @@ internal static partial class LoggingBenchmarkExtensions
     [LoggerMessage(Level = LogLevel.Information, Message = "The {QuickAnimal} jumps over the {LazyAnimal}")]
     public static partial void InformationQuickLazyAnimal(this ILogger logger, string quickAnimal, string lazyAnimal);
 }
+#pragma warning restore MA0048 // File name must match type name

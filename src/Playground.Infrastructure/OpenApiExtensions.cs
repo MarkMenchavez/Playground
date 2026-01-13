@@ -2,10 +2,8 @@ using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 
 using Scalar.AspNetCore;
 
@@ -57,20 +55,4 @@ internal static class OpenApiExtensions
 
         return app;
     }
-}
-
-internal class ConfigureOpenApiOptions(IApiVersionDescriptionProvider versionDescriptionProvider)
-    : IConfigureNamedOptions<OpenApiOptions>
-{
-    public void Configure(string? name, OpenApiOptions options)
-    {
-        var description = versionDescriptionProvider.ApiVersionDescriptions
-            .FirstOrDefault(d => d.GroupName == name);
-        if (description is not null)
-        {
-            options.ShouldInclude = (api) => api.GroupName == name;
-        }
-    }
-
-    public void Configure(OpenApiOptions options) => Configure(Options.DefaultName, options);
 }

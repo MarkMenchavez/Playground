@@ -6,6 +6,10 @@
   <ItemGroup>
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.17.0.131074" />
     <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
+    <PackageVersion Include="Roslynator.Analyzers" Version="4.9.0" />
+    <PackageVersion Include="Meziantou.Analyzer" Version="2.0.276" />
+    <PackageVersion Include="Async.Analyzers" Version="1.0.16" />
+    <PackageVersion Include="AsyncFixer" Version="2.1.0" />
 
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.1" />

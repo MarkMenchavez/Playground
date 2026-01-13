@@ -18,6 +18,7 @@ internal sealed class GlobalExceptionHandler(
 {
     private const string CorrelationHeader = "X-Correlation-Id";
     private const string TraceHeader = "X-Trace-Id";
+    private const string IncludeExceptionDetailsInProblemDetailsFeature = "IncludeExceptionDetailsInProblemDetails";
 
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
@@ -43,7 +44,8 @@ internal sealed class GlobalExceptionHandler(
 
         httpContext.Response.Headers.TryAdd(TraceHeader, traceId);
 
-        if (await featureManager.IsEnabledAsync("IncludeExceptionDetailsInProblemDetails", cancellationToken))
+        if (await featureManager.IsEnabledAsync(IncludeExceptionDetailsInProblemDetailsFeature, cancellationToken)
+            .ConfigureAwait(false))
         {
             problemDetails.Extensions["exception"] = new
             {
@@ -69,7 +71,7 @@ internal sealed class GlobalExceptionHandler(
             Exception = exception
         };
 
-        return await problemDetailsService.TryWriteAsync(context);
+        return await problemDetailsService.TryWriteAsync(context).ConfigureAwait(false);
     }
 
     private static string? GetCorrelationId(HttpContext httpContext)
