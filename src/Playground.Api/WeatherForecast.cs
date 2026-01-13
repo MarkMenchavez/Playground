@@ -52,6 +52,7 @@ internal static class ServiceCollectionExtensions
         return services.AddOptions<WeatherForecastServiceOptions>()
              .Validate(o => o.DefaultDays > 0, "DefaultDays must be greater than zero.")
              .Validate(o => o.Summaries.Length > 0, "Summaries must contain at least one summary.")
+             .Validate(o => o.GenerationMaxSeconds > 0, "GenerationMaxSecond must be greater than zero.")
              .Validate(o => o.GenerationDelayMilliseconds >= 0, "GenerationDelayMilliseconds must be zero or a positive integer.")
              .Validate(o => o.MinimumTemperatureCelsius < o.MaximumTemperatureCelsius, "MinimumTemperatureCelsius must be less than MaximumTemperatureCelsius.")
              .ValidateOnStart();
@@ -91,6 +92,7 @@ internal static class EndpointRouteBuilderExtensions
         groupV2.MapGet("weatherforecast", async (int days, IWeatherForecastService service, CancellationToken cancellationToken)
                 => TypedResults.Ok(await service.GetForecastsAsync(days, cancellationToken)))
             .MapToApiVersion(2.0)
+            .ProducesProblem(StatusCodes.Status500InternalServerError)
             .AddOpenApiOperationTransformer((operation, context, cancellationToken) =>
             {
                 operation.Summary = "Gets the weather forecast for the specified number of days.";
@@ -119,6 +121,8 @@ internal class WeatherForecastServiceOptions
 
     public string[] Summaries { get; set; } = [];
 
+    public int GenerationMaxSeconds { get; set; } = 2;
+
     public int GenerationDelayMilliseconds { get; set; } = 10;
 
     public int MinimumTemperatureCelsius { get; set; } = -20;
@@ -145,13 +149,16 @@ internal class WeatherForecastService(
             throw new ArgumentOutOfRangeException(nameof(days), "Days must be greater than zero.");
         }
 
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(serviceOptions.GenerationMaxSeconds));
+        using var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeout.Token);
+
         var summaries = serviceOptions.Summaries;
 
         var forecasts = new List<WeatherForecast>();
 
         foreach (var index in Enumerable.Range(1, days))
         {
-            await Task.Delay(serviceOptions.GenerationDelayMilliseconds, cancellationToken);
+            await Task.Delay(serviceOptions.GenerationDelayMilliseconds, linkedTokenSource.Token);
             forecasts.Add(new WeatherForecast(
                 DateOnly.FromDateTime(DateTime.Now.AddDays(index - 1)),
                 Random.Shared.Next(serviceOptions.MinimumTemperatureCelsius, serviceOptions.MaximumTemperatureCelsius),

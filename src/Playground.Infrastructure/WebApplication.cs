@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.FeatureManagement;
 
 using Serilog;
 
@@ -17,7 +18,11 @@ public static class WebApplicationBuilderExtensions
         builder.WebHost.ConfigureKestrelServer(builder.Configuration);
         builder.ConfigureLogging(builder.Configuration);
 
+        builder.Services.AddFeatureManagement();
         builder.Services.AddVersionedOpenApi();
+
+        builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+        builder.Services.AddProblemDetails();
 
         return builder;
     }
@@ -60,6 +65,8 @@ public static class WebApplicationExtensions
 
         app.UseSerilogRequestLogging();
         app.UseHttpLogging();
+
+        app.UseExceptionHandler();
 
         ////app.UseHsts();
         ////app.UseHttpsRedirection();
