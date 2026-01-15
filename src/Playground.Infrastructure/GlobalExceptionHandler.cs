@@ -32,16 +32,17 @@ internal sealed class GlobalExceptionHandler(
         var correlationId = GetCorrelationId(httpContext);
         var traceId = Activity.Current?.TraceId.ToHexString() ?? httpContext.TraceIdentifier;
 
-        problemDetails.Detail = correlationId is not null
+        problemDetails.Detail = !string.IsNullOrWhiteSpace(correlationId)
             ? "Please contact support with the provided correlation identifier."
             : "Please contact support with the provided trace identifier.";
 
-        if (correlationId is not null)
+        if (!string.IsNullOrWhiteSpace(correlationId))
         {
             problemDetails.Extensions["correlationId"] = correlationId;
             httpContext.Response.Headers.TryAdd(CorrelationHeader, correlationId);
         }
 
+        httpContext.Response.ContentType = "application/problem+json";
         httpContext.Response.Headers.TryAdd(TraceHeader, traceId);
 
         if (await featureManager.IsEnabledAsync(IncludeExceptionDetailsInProblemDetailsFeature, cancellationToken)

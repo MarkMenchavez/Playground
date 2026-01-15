@@ -6,6 +6,7 @@
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Http" />
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
+    <PackageReference Include="FluentValidation.AspNetCore" />
     <PackageReference Include="Microsoft.AspNetCore.HeaderPropagation" />
     <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" />
     <PackageReference Include="MinimalHttpLogger" />

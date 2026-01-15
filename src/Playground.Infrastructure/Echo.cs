@@ -1,5 +1,7 @@
 #pragma warning disable MA0048 // File name must match type name
 
+using System.Text;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -10,38 +12,40 @@ namespace Playground.Infrastructure;
 
 public interface IEchoServiceAgent
 {
-    Task<string> EchoAsync(string message);
+    Task<string> EchoAsync(string message, CancellationToken cancellationToken = default);
 }
 
 public class EchoServiceAgent(HttpClient httpClient) : IEchoServiceAgent
 {
-    public async Task<string> EchoAsync(string message)
+    public async Task<string> EchoAsync(string message, CancellationToken cancellationToken = default)
     {
-        var content = new StringContent(message);
+        var content = new StringContent(message, Encoding.UTF8, "text/plain");
 
-        var response = await httpClient.PostAsync("/api/echo", content).ConfigureAwait(false);
+        var response = await httpClient.PostAsync("/api/echo", content, cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
     }
 }
 
 internal static class EchoEndpointBuilderExtensions
 {
+    private const string EchoApiFeature = "EchoApi";
+
     public static IEndpointRouteBuilder MapEchoApi(this IEndpointRouteBuilder builder)
     {
-        builder.MapPost("/api/echo", async (HttpContext httpContext, ILoggerFactory loggerFactory) =>
+        builder.MapPost("/api/echo", async (HttpContext context, ILoggerFactory loggerFactory, CancellationToken cancellationToken) =>
         {
             var logger = loggerFactory.CreateLogger("EchoApi");
 
-            using var reader = new StreamReader(httpContext.Request.Body);
-            var message = await reader.ReadToEndAsync().ConfigureAwait(false);
+            using var reader = new StreamReader(context.Request.Body, Encoding.UTF8);
+            var message = await reader.ReadToEndAsync(cancellationToken);
 
             logger.LogInformation("Received echo message: {Message}", message);
 
-            return Results.Ok(new { message });
+            return Results.Text(message, "text/plain", Encoding.UTF8);
         })
-        .WithFeatureGate("EchoApi");
+        .WithFeatureGate(EchoApiFeature);
 
         return builder;
     }

@@ -1,7 +1,12 @@
 #pragma warning disable MA0048 // File name must match type name
 
+using System.Globalization;
+
 using Asp.Versioning;
 
+using FluentValidation;
+
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
@@ -15,6 +20,39 @@ internal interface IWeatherForecastService
     Task<IEnumerable<WeatherForecast>> GetForecastsAsync(CancellationToken cancellationToken = default);
 
     Task<IEnumerable<WeatherForecast>> GetForecastsAsync(int days, CancellationToken cancellationToken = default);
+}
+
+internal record GetForecastRequest([property: FromQuery(Name = "days")] int Days) : IParsable<GetForecastRequest>
+{
+    public static bool TryParse(string? s, IFormatProvider? provider, out GetForecastRequest result)
+    {
+        if (int.TryParse(s, CultureInfo.InvariantCulture, out var days))
+        {
+            result = new GetForecastRequest(days);
+            return true;
+        }
+
+        result = default!;
+        return false;
+    }
+
+    public static GetForecastRequest Parse(string s, IFormatProvider? provider)
+    {
+        if (TryParse(s, provider, out var result))
+        {
+            return result;
+        }
+
+        throw new FormatException($"Invalid GetForecastRequest: {s}");
+    }
+}
+
+internal class GetForecastRequestValidator : AbstractValidator<GetForecastRequest>
+{
+    public GetForecastRequestValidator()
+    {
+        RuleFor(x => x.Days).GreaterThan(0).WithMessage("Days must be greater than zero");
+    }
 }
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
@@ -46,6 +84,8 @@ internal static class ServiceCollectionExtensions
 
     private static IServiceCollection AddWeatherForecast(this IServiceCollection services)
     {
+        services.AddScoped<IValidator<GetForecastRequest>, GetForecastRequestValidator>();
+
         services.AddEchoServiceAgent();
         services.TryAddTransient<IWeatherForecastService, WeatherForecastService>();
         services.ConfigureWeatherForecastServiceOptions();
@@ -107,15 +147,16 @@ internal static class EndpointRouteBuilderExtensions
             .WithApiVersionSet(versionSet)
             .HasApiVersion(2.0);
 
-        groupV2.MapGet("weatherforecast", async (int days, IWeatherForecastService service, CancellationToken cancellationToken)
-                => TypedResults.Ok(await service.GetForecastsAsync(days, cancellationToken)))
-            .MapToApiVersion(2.0)
+        groupV2.MapGet("weatherforecast", async ([FromQuery]GetForecastRequest days, IWeatherForecastService service, CancellationToken cancellationToken) =>
+                TypedResults.Ok(await service.GetForecastsAsync(days.Days, cancellationToken)))
+            .AddEndpointFilter<FluentValidationEndpointFilter<GetForecastRequest>>()
+            .ProducesValidationProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status500InternalServerError)
-            .AddOpenApiOperationTransformer((operation, context, cancellationToken) =>
+            .Produces<IEnumerable<WeatherForecast>>(StatusCodes.Status200OK)
+            .AddOpenApiOperationTransformer((op, ctx, ct) =>
             {
-                operation.Summary = "Gets the weather forecast for the specified number of days.";
-                operation.Description = "Retrieves an array of weather forecast data for the specified number of days.";
-
+                op.Summary = "Gets weather forecast for specified days";
+                op.Description = "Validates input and returns forecasts";
                 return Task.CompletedTask;
             });
 
@@ -155,6 +196,8 @@ internal class WeatherForecastService(
     ILogger<WeatherForecastService> logger)
     : IWeatherForecastService
 {
+    private const string EchoApiFeature = "EchoApi";
+
     private readonly WeatherForecastServiceOptions serviceOptions = options.Value;
 
     public Task<IEnumerable<WeatherForecast>> GetForecastsAsync(CancellationToken cancellationToken = default)
@@ -164,14 +207,9 @@ internal class WeatherForecastService(
 
     public async Task<IEnumerable<WeatherForecast>> GetForecastsAsync(int days, CancellationToken cancellationToken = default)
     {
-        if (days <= 0)
+        if (await featureManager.IsEnabledAsync(EchoApiFeature, cancellationToken))
         {
-            throw new ArgumentOutOfRangeException(nameof(days), "Days must be greater than zero.");
-        }
-
-        if (await featureManager.IsEnabledAsync("EchoApi"))
-        {
-            await echoServiceAgent.EchoAsync($"Generating {days} weather forecasts.");
+            await echoServiceAgent.EchoAsync($"Generating {days} weather forecasts.", cancellationToken);
         }
 
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(serviceOptions.GenerationMaxSeconds));

@@ -1,3 +1,7 @@
+using System.Reflection;
+
+using FluentValidation;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -18,6 +22,8 @@ public static class WebApplicationBuilderExtensions
 
         builder.Services.AddFeatureManagement();
         builder.Services.AddVersionedOpenApi();
+
+        builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
         builder.Services.ConfigureHeaderPropagation(builder.Configuration);
 
