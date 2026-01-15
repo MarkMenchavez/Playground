@@ -4,23 +4,21 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="Microsoft.AspNetCore.HeaderPropagation" Version="10.0.1" />
+    <PackageVersion Include="MinimalHttpLogger" Version="3.0.1" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.17.0.131074" />
     <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
     <PackageVersion Include="Roslynator.Analyzers" Version="4.9.0" />
     <PackageVersion Include="Meziantou.Analyzer" Version="2.0.276" />
     <PackageVersion Include="Async.Analyzers" Version="1.0.16" />
     <PackageVersion Include="AsyncFixer" Version="2.1.0" />
-
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.1" />
-
     <PackageVersion Include="Microsoft.FeatureManagement.AspNetCore" Version="4.4.0" />
-
     <PackageVersion Include="Asp.Versioning.Http" Version="8.1.1" />
     <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.1" />
     <PackageVersion Include="Scalar.AspNetCore" Version="2.12.4" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
-
     <PackageVersion Include="Serilog.AspnetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Exceptions" Version="8.4.0" />
     <PackageVersion Include="Serilog.Sinks.Async" Version="2.1.0" />

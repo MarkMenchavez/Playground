@@ -1,0 +1,32 @@
+meta {
+  name: Echo
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{BaseUri}}/api/echo
+  body: text
+  auth: inherit
+}
+
+headers {
+  x-correlation-id: bruno-{{$guid}}
+}
+
+body:json {
+  {
+    
+  }
+}
+
+body:text {
+  The quick brown fox jumps over the head of the lazy dog.
+}
+
+settings {
+  encodeUrl: true
+  timeout: 3000
+  followRedirects: true
+  maxRedirects: 5
+}

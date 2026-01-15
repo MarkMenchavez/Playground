@@ -4,6 +4,9 @@ using Asp.Versioning;
 
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Microsoft.FeatureManagement;
+
+using Playground.Infrastructure;
 
 namespace Playground.Api;
 
@@ -43,6 +46,7 @@ internal static class ServiceCollectionExtensions
 
     private static IServiceCollection AddWeatherForecast(this IServiceCollection services)
     {
+        services.AddEchoServiceAgent();
         services.TryAddTransient<IWeatherForecastService, WeatherForecastService>();
         services.ConfigureWeatherForecastServiceOptions();
 
@@ -58,6 +62,18 @@ internal static class ServiceCollectionExtensions
              .Validate(o => o.GenerationDelayMilliseconds >= 0, "GenerationDelayMilliseconds must be zero or a positive integer.")
              .Validate(o => o.MinimumTemperatureCelsius < o.MaximumTemperatureCelsius, "MinimumTemperatureCelsius must be less than MaximumTemperatureCelsius.")
              .ValidateOnStart();
+    }
+
+    private static IServiceCollection AddEchoServiceAgent(this IServiceCollection services)
+    {
+        services.AddHttpClient<IEchoServiceAgent, EchoServiceAgent>((serviceProvider, client) =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            client.BaseAddress = new Uri(configuration.GetValue<string>("ServiceAgents:EchoApi:BaseUrl")!);
+        })
+        .AddHeaderPropagation();
+
+        return services;
     }
 }
 
@@ -133,6 +149,8 @@ internal class WeatherForecastServiceOptions
 }
 
 internal class WeatherForecastService(
+    IEchoServiceAgent echoServiceAgent,
+    IFeatureManager featureManager,
     IOptions<WeatherForecastServiceOptions> options,
     ILogger<WeatherForecastService> logger)
     : IWeatherForecastService
@@ -149,6 +167,11 @@ internal class WeatherForecastService(
         if (days <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(days), "Days must be greater than zero.");
+        }
+
+        if (await featureManager.IsEnabledAsync("EchoApi"))
+        {
+            await echoServiceAgent.EchoAsync($"Generating {days} weather forecasts.");
         }
 
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(serviceOptions.GenerationMaxSeconds));

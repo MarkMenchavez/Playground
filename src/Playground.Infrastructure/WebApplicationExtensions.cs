@@ -12,12 +12,14 @@ public static class WebApplicationExtensions
 
         app.UseSerilogRequestLogging();
         app.UseHttpLogging();
+        app.UseHeaderPropagation();
 
         app.UseExceptionHandler();
 
         ////app.UseHsts();
         ////app.UseHttpsRedirection();
 
+        app.MapEchoApi();
         return app;
     }
 }

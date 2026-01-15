@@ -11,7 +11,8 @@ try
         .CreateBuilder(args)
         .Initialize();
 
-    builder.Services.AddWeatherForecast(builder.Configuration);
+    builder.Services
+        .AddWeatherForecast(builder.Configuration);
 
     var app = builder.Build()
         .InitializePipeline();
