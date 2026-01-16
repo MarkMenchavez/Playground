@@ -26,6 +26,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
         builder.Services.ConfigureHeaderPropagation(builder.Configuration);
+        builder.Services.AddServiceDiscovery();
 
         builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
         builder.Services.AddProblemDetails();

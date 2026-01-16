@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{BaseUri}}/api/v2/weatherforecast?days=5
+  url: {{ApiBaseUri}}/api/v2/weatherforecast?days=5
   body: none
   auth: inherit
 }
@@ -20,7 +20,7 @@ headers {
 
 settings {
   encodeUrl: true
-  timeout: 3000
+  timeout: 15000
   followRedirects: true
   maxRedirects: 5
 }

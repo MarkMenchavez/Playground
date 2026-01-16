@@ -106,12 +106,13 @@ internal static class ServiceCollectionExtensions
 
     private static IServiceCollection AddEchoServiceAgent(this IServiceCollection services)
     {
-        services.AddHttpClient<IEchoServiceAgent, EchoServiceAgent>((serviceProvider, client) =>
+        services.AddHttpClient<IEchoServiceAgent, EchoServiceAgent>(client =>
         {
-            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-            client.BaseAddress = new Uri(configuration.GetValue<string>("ServiceAgents:EchoApi:BaseUrl")!);
+            client.BaseAddress = new("http://echoapi");
         })
-        .AddHeaderPropagation();
+        .AddServiceDiscovery()
+        .AddHeaderPropagation()
+        .AddStandardResilienceHandler();
 
         return services;
     }
