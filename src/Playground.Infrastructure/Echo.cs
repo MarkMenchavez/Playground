@@ -41,7 +41,9 @@ internal static class EchoEndpointBuilderExtensions
             using var reader = new StreamReader(context.Request.Body, Encoding.UTF8);
             var message = await reader.ReadToEndAsync(cancellationToken);
 
-            logger.LogInformation("Received echo message: {Message}", message);
+            // Sanitize user input before logging to prevent log forging via control characters.
+            var sanitizedMessage = new string(message.Where(c => !char.IsControl(c) || c == '\t').ToArray());
+            logger.LogInformation("Received echo message: {Message}", sanitizedMessage);
 
             return Results.Text(message, "text/plain", Encoding.UTF8);
         })
