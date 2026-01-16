@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Playground.Benchmarks", "tests\Playground.Benchmarks\Playground.Benchmarks.csproj", "{6D5C91A5-2EBA-436B-AD62-E0297E5E1561}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Playground.worker", "src\Playground.Worker\Playground.worker.csproj", "{C9F46E27-A2E6-4C43-9FC5-E21B7C21E0B4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Playground.worker", "src\Playground.Worker\Playground.Worker.csproj", "{C9F46E27-A2E6-4C43-9FC5-E21B7C21E0B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
