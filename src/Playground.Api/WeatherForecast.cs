@@ -1,7 +1,5 @@
 #pragma warning disable MA0048 // File name must match type name
 
-using System.Globalization;
-
 using Asp.Versioning;
 
 using FluentValidation;
@@ -26,7 +24,7 @@ internal record GetForecastRequest([property: FromQuery(Name = "days")] int Days
 {
     public static bool TryParse(string? s, IFormatProvider? provider, out GetForecastRequest result)
     {
-        if (int.TryParse(s, CultureInfo.InvariantCulture, out var days))
+        if (int.TryParse(s, provider, out var days))
         {
             result = new GetForecastRequest(days);
             return true;
@@ -107,9 +105,7 @@ internal static class ServiceCollectionExtensions
     private static IServiceCollection AddEchoServiceAgent(this IServiceCollection services)
     {
         services.AddHttpClient<IEchoServiceAgent, EchoServiceAgent>(client =>
-        {
-            client.BaseAddress = new("https://echoapi");
-        })
+            client.BaseAddress = new("https://echoapi"))
         .AddServiceDiscovery()
         .AddHeaderPropagation()
         .AddStandardResilienceHandler();
@@ -208,13 +204,13 @@ internal class WeatherForecastService(
 
     public async Task<IEnumerable<WeatherForecast>> GetForecastsAsync(int days, CancellationToken cancellationToken = default)
     {
-        if (await featureManager.IsEnabledAsync(EchoApiFeature, cancellationToken))
-        {
-            await echoServiceAgent.EchoAsync($"Generating {days} weather forecasts.", cancellationToken);
-        }
-
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(serviceOptions.GenerationMaxSeconds));
         using var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeout.Token);
+
+        if (await featureManager.IsEnabledAsync(EchoApiFeature, linkedTokenSource.Token))
+        {
+            await echoServiceAgent.EchoAsync($"Generating {days} weather forecasts.", linkedTokenSource.Token);
+        }
 
         var summaries = serviceOptions.Summaries;
 

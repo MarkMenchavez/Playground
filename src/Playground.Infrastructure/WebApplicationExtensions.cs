@@ -8,6 +8,8 @@ public static class WebApplicationExtensions
 {
     public static WebApplication InitializePipeline(this WebApplication app)
     {
+        app.UseHttpsRedirection();
+
         app.MapScalarOpenApi();
 
         app.UseSerilogRequestLogging();
@@ -15,9 +17,6 @@ public static class WebApplicationExtensions
         app.UseHeaderPropagation();
 
         app.UseExceptionHandler();
-
-        ////app.UseHsts();
-        app.UseHttpsRedirection();
 
         app.MapEchoApi();
         return app;

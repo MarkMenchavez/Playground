@@ -28,6 +28,8 @@ public static class WebApplicationBuilderExtensions
         builder.Services.ConfigureHeaderPropagation(builder.Configuration);
         builder.Services.AddServiceDiscovery();
 
+        builder.ConfigureOpenTelemetry(builder.Configuration);
+
         builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
         builder.Services.AddProblemDetails();
 
