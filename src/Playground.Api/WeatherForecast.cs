@@ -108,7 +108,7 @@ internal static class ServiceCollectionExtensions
     {
         services.AddHttpClient<IEchoServiceAgent, EchoServiceAgent>(client =>
         {
-            client.BaseAddress = new("http://echoapi");
+            client.BaseAddress = new("https://echoapi");
         })
         .AddServiceDiscovery()
         .AddHeaderPropagation()

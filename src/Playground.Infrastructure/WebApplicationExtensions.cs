@@ -17,7 +17,7 @@ public static class WebApplicationExtensions
         app.UseExceptionHandler();
 
         ////app.UseHsts();
-        ////app.UseHttpsRedirection();
+        app.UseHttpsRedirection();
 
         app.MapEchoApi();
         return app;
