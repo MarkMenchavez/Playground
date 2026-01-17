@@ -8,6 +8,8 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
+using Rebus.OpenTelemetry.Configuration;
+
 namespace Playground.Infrastructure;
 
 internal static class OpenTelemetryExtensions
@@ -36,12 +38,15 @@ internal static class OpenTelemetryExtensions
             {
                 options.RecordException = true;
             });
+
+            tracing.AddRebusInstrumentation();
         });
 
         telemetryBuilder.WithMetrics(metrics =>
         {
             metrics.AddAspNetCoreInstrumentation();
             metrics.AddHttpClientInstrumentation();
+            metrics.AddRebusInstrumentation();
         });
 
         var enableOtelLogging = builder.Configuration.GetValue<bool>("FeatureManagement:EnableOtelLogging");

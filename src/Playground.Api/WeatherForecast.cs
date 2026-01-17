@@ -101,17 +101,6 @@ internal static class ServiceCollectionExtensions
              .Validate(o => o.MinimumTemperatureCelsius < o.MaximumTemperatureCelsius, "MinimumTemperatureCelsius must be less than MaximumTemperatureCelsius.")
              .ValidateOnStart();
     }
-
-    private static IServiceCollection AddEchoServiceAgent(this IServiceCollection services)
-    {
-        services.AddHttpClient<IEchoServiceAgent, EchoServiceAgent>(client =>
-            client.BaseAddress = new("https://echoapi"))
-        .AddServiceDiscovery()
-        .AddHeaderPropagation()
-        .AddStandardResilienceHandler();
-
-        return services;
-    }
 }
 
 internal static class EndpointRouteBuilderExtensions
@@ -189,6 +178,7 @@ internal class WeatherForecastServiceOptions
 internal class WeatherForecastService(
     IEchoServiceAgent echoServiceAgent,
     IFeatureManager featureManager,
+    IEventPublisher eventPublisher,
     IOptions<WeatherForecastServiceOptions> options,
     ILogger<WeatherForecastService> logger)
     : IWeatherForecastService
@@ -219,10 +209,15 @@ internal class WeatherForecastService(
         foreach (var index in Enumerable.Range(1, days))
         {
             await Task.Delay(serviceOptions.GenerationDelayMilliseconds, linkedTokenSource.Token);
-            forecasts.Add(new WeatherForecast(
+
+            var forecast = new WeatherForecast(
                 DateOnly.FromDateTime(DateTime.UtcNow.AddDays(index - 1)),
                 Random.Shared.Next(serviceOptions.MinimumTemperatureCelsius, serviceOptions.MaximumTemperatureCelsius),
-                summaries[Random.Shared.Next(summaries.Length)]));
+                summaries[Random.Shared.Next(summaries.Length)]);
+
+            await eventPublisher.PublishAsync(forecast, linkedTokenSource.Token);
+
+            forecasts.Add(forecast);
         }
 
         logger.WeatherForecastGenerated(forecasts.Count);

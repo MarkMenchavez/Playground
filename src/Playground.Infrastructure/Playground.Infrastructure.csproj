@@ -16,6 +16,10 @@
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
+    <PackageReference Include="Rebus.OpenTelemetry" />
+    <PackageReference Include="Rebus.RabbitMq" />
+    <PackageReference Include="Rebus.Serilog" />
+    <PackageReference Include="Rebus.ServiceProvider" />
     <PackageReference Include="Scalar.AspNetCore" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Serilog.AspnetCore" />

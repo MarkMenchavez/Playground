@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement.AspNetCore;
 
@@ -15,16 +16,17 @@ public interface IEchoServiceAgent
     Task<string> EchoAsync(string message, CancellationToken cancellationToken = default);
 }
 
-public class EchoServiceAgent(HttpClient httpClient) : IEchoServiceAgent
+public static class EchoServiceCollectionExtensions
 {
-    public async Task<string> EchoAsync(string message, CancellationToken cancellationToken = default)
+    public static IServiceCollection AddEchoServiceAgent(this IServiceCollection services)
     {
-        var content = new StringContent(message, Encoding.UTF8, "text/plain");
+        services.AddHttpClient<IEchoServiceAgent, EchoServiceAgent>(client =>
+            client.BaseAddress = new("https://echoapi"))
+        .AddServiceDiscovery()
+        .AddHeaderPropagation()
+        .AddStandardResilienceHandler();
 
-        var response = await httpClient.PostAsync("/api/echo", content, cancellationToken).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
-
-        return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        return services;
     }
 }
 
@@ -51,6 +53,7 @@ internal static class EchoEndpointBuilderExtensions
                 {
                     continue;
                 }
+
                 if (char.IsControl(c) && c != '\t')
                 {
                     builder.Append(' ');
@@ -60,13 +63,37 @@ internal static class EchoEndpointBuilderExtensions
                     builder.Append(c);
                 }
             }
+
             var sanitizedMessage = builder.ToString();
-            logger.LogInformation("Received echo message: {Message}", sanitizedMessage);
+            logger.EchoReceived(sanitizedMessage);
 
             return Results.Text(message, "text/plain", Encoding.UTF8);
         })
         .WithFeatureGate(EchoApiFeature);
 
         return builder;
+    }
+}
+
+internal static partial class EchoApiLogger
+{
+    [LoggerMessage(
+        Level = LogLevel.Information,
+        Message = "Received echo message: {Message}")]
+    public static partial void EchoReceived(
+        this ILogger logger,
+        string message);
+}
+
+internal class EchoServiceAgent(HttpClient httpClient) : IEchoServiceAgent
+{
+    public async Task<string> EchoAsync(string message, CancellationToken cancellationToken = default)
+    {
+        var content = new StringContent(message, Encoding.UTF8, "text/plain");
+
+        var response = await httpClient.PostAsync("/api/echo", content, cancellationToken).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
     }
 }
