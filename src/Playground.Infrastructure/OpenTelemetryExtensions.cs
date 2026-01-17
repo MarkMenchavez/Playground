@@ -14,11 +14,11 @@ namespace Playground.Infrastructure;
 
 internal static class OpenTelemetryExtensions
 {
-    public static void ConfigureOpenTelemetry(this WebApplicationBuilder builder, IConfiguration configuration)
+    public static void ConfigureOpenTelemetry(this WebApplicationBuilder builder)
     {
         var telemetryBuilder = builder.Services.AddOpenTelemetry()
-            .ConfigureResource(b =>
-                b.AddService(
+            .ConfigureResource(resource =>
+                resource.AddService(
                     serviceName: builder.Environment.ApplicationName,
                     serviceNamespace: null,
                     serviceVersion: null,

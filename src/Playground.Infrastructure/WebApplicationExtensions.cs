@@ -19,6 +19,7 @@ public static class WebApplicationExtensions
         app.UseExceptionHandler();
 
         app.MapEchoApi();
+
         return app;
     }
 }

@@ -34,7 +34,14 @@ internal static class RebusExtensions
                     .Serialization(serializer => serializer.UseNewtonsoftJson(JsonInteroperabilityMode.PureJson))
                     .Transport(transport => transport
                         .UseRabbitMqAsOneWayClient(connectionString: connectionString)
-                        .ClientConnectionName(connectionName: webHostEnvironment.ApplicationName))
+                        ////.ClientConnectionName(connectionName: webHostEnvironment.ApplicationName) // Used to work in Rebus.RabbitMQ 9.4.1
+                        .CustomizeConnectionFactory(connectionFactory =>
+                        {
+                            // Workaround -- see https://github.com/rebus-org/Rebus.RabbitMq/issues/135
+                            connectionFactory.ClientProvidedName = webHostEnvironment.ApplicationName;
+
+                            return connectionFactory;
+                        }))
                     .Options(options =>
                     {
                         options.SetBusName(name);

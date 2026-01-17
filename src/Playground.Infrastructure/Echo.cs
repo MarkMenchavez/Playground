@@ -43,29 +43,7 @@ internal static class EchoEndpointBuilderExtensions
             using var reader = new StreamReader(context.Request.Body, Encoding.UTF8);
             var message = await reader.ReadToEndAsync(cancellationToken);
 
-            // Sanitize user input before logging to prevent log forging via control characters
-            // and embedded newlines. Remove CR/LF entirely and replace other control characters
-            // (except tab) with a space so the logged message remains on a single line.
-            var builder = new StringBuilder(message.Length);
-            foreach (var c in message)
-            {
-                if (c == '\r' || c == '\n')
-                {
-                    continue;
-                }
-
-                if (char.IsControl(c) && c != '\t')
-                {
-                    builder.Append(' ');
-                }
-                else
-                {
-                    builder.Append(c);
-                }
-            }
-
-            var sanitizedMessage = builder.ToString();
-            logger.EchoReceived(sanitizedMessage);
+            logger.EchoReceived(message.Sanitize());
 
             return Results.Text(message, "text/plain", Encoding.UTF8);
         })

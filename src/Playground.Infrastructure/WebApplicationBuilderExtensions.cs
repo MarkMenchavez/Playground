@@ -11,8 +11,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
 
-using Rebus.Bus;
-
 namespace Playground.Infrastructure;
 
 public static class WebApplicationBuilderExtensions
@@ -31,7 +29,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.ConfigureHeaderPropagation(builder.Configuration);
         builder.Services.AddServiceDiscovery();
 
-        builder.ConfigureOpenTelemetry(builder.Configuration);
+        builder.ConfigureOpenTelemetry();
 
         builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
         builder.Services.AddProblemDetails();

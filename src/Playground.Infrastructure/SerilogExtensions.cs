@@ -16,7 +16,7 @@ public static class SerilogExtensions
             .CreateBootstrapLogger();
     }
 
-    public static IHostBuilder UseSerilogLogging(this IHostBuilder hostBuilder)
+    internal static IHostBuilder UseSerilogLogging(this IHostBuilder hostBuilder)
     {
         hostBuilder.ConfigureServices(services =>
         {
