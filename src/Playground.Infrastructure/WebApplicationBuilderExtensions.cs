@@ -29,16 +29,30 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddVersionedOpenApi();
         builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
-        builder.Services.ConfigureHeaderPropagation(builder.Configuration);
         builder.Services.AddServiceDiscovery();
+        builder.Services.ConfigureHeaderPropagation(builder.Configuration);
 
         builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
         builder.Services.AddProblemDetails();
 
-        builder.Services.AddOneWayBus();
+        builder.Services.AddOneWayServiceBus();
         builder.Services.TryAddTransient<IEventPublisher, EventPublisher>();
 
         return builder;
+    }
+
+    internal static void ConfigureHeaderPropagation(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddHeaderPropagation(options =>
+        {
+            var headerOptions = new HttpHeaderPropagationOptions();
+            configuration.GetSection("HeaderPropagation").Bind(headerOptions);
+
+            foreach (var header in headerOptions.Headers)
+            {
+                options.Headers.Add(header);
+            }
+        });
     }
 
     private static void ConfigureServiceProvider(this IHostBuilder hostBuilder)
@@ -126,25 +140,12 @@ public static class WebApplicationBuilderExtensions
     {
         builder.Logging.ClearProviders();
         builder.Host.UseSerilogLogging();
+
         builder.Services.UseMinimalHttpLogger();
         builder.Services.AddHttpLogging(options =>
         {
             builder.Configuration.GetSection("HttpLogging").Bind(options);
             options.CombineLogs = true;
-        });
-    }
-
-    private static void ConfigureHeaderPropagation(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddHeaderPropagation(options =>
-        {
-            var headerOptions = new HttpHeaderPropagationOptions();
-            configuration.GetSection("HeaderPropagation").Bind(headerOptions);
-
-            foreach (var header in headerOptions.Headers)
-            {
-                options.Headers.Add(header);
-            }
         });
     }
 

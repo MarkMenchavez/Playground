@@ -1,5 +1,3 @@
-#pragma warning disable MA0048 // File name must match type name
-
 using Asp.Versioning;
 
 using FluentValidation;
@@ -7,8 +5,8 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Microsoft.FeatureManagement;
 
+using Playground.Events;
 using Playground.Infrastructure;
 
 namespace Playground.Api;
@@ -177,14 +175,11 @@ internal class WeatherForecastServiceOptions
 
 internal class WeatherForecastService(
     IEchoServiceAgent echoServiceAgent,
-    IFeatureManager featureManager,
     IEventPublisher eventPublisher,
     IOptions<WeatherForecastServiceOptions> options,
     ILogger<WeatherForecastService> logger)
     : IWeatherForecastService
 {
-    private const string EchoApiFeature = "EchoApi";
-
     private readonly WeatherForecastServiceOptions serviceOptions = options.Value;
 
     public Task<IEnumerable<WeatherForecast>> GetForecastsAsync(CancellationToken cancellationToken = default)
@@ -197,10 +192,7 @@ internal class WeatherForecastService(
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(serviceOptions.GenerationMaxSeconds));
         using var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeout.Token);
 
-        if (await featureManager.IsEnabledAsync(EchoApiFeature, linkedTokenSource.Token))
-        {
-            await echoServiceAgent.EchoAsync($"Generating {days} weather forecasts.", linkedTokenSource.Token);
-        }
+        await echoServiceAgent.EchoAsync($"Generating {days} weather forecasts.", linkedTokenSource.Token);
 
         var summaries = serviceOptions.Summaries;
 
@@ -215,7 +207,7 @@ internal class WeatherForecastService(
                 Random.Shared.Next(serviceOptions.MinimumTemperatureCelsius, serviceOptions.MaximumTemperatureCelsius),
                 summaries[Random.Shared.Next(summaries.Length)]);
 
-            await eventPublisher.PublishAsync(forecast, linkedTokenSource.Token);
+            await eventPublisher.PublishAsync(new WeatherForecastGeneratedEvent(), linkedTokenSource.Token);
 
             forecasts.Add(forecast);
         }

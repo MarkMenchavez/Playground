@@ -9,6 +9,16 @@ using Microsoft.FeatureManagement;
 
 namespace Playground.Infrastructure;
 
+internal static partial class GlobalExceptionHandlerLogger
+{
+    [LoggerMessage(
+        Level = LogLevel.Error,
+        Message = "An unhandled exception occurred while processing the request.")]
+    public static partial void UnhandledException(
+        this ILogger<GlobalExceptionHandler> logger,
+        Exception exception);
+}
+
 internal sealed class GlobalExceptionHandler(
     IFeatureManager featureManager,
     ILogger<GlobalExceptionHandler> logger,
@@ -22,7 +32,7 @@ internal sealed class GlobalExceptionHandler(
 
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        logger.LogError(exception, "An unhandled exception occurred while processing the request.");
+        logger.UnhandledException(exception);
 
         var problemDetails = problemDetailsFactory.CreateProblemDetails(httpContext);
 

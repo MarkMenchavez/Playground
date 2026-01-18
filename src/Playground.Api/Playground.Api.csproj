@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
     <UserSecretsId>12338139-06cd-4817-8dc4-bcae5351a2ba</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../Playground.Events/Playground.Events.csproj" />
     <ProjectReference Include="../Playground.Infrastructure/Playground.Infrastructure.csproj" />
   </ItemGroup>
 

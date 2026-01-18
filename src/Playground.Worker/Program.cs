@@ -1,4 +1,5 @@
 using Playground.Infrastructure;
+using Playground.Worker;
 
 using Serilog;
 
@@ -9,6 +10,8 @@ try
     var builder = WebApplication
         .CreateBuilder(args)
         .Initialize();
+
+    builder.Host.AddWeatherForecastHandler();
 
     var app = builder.Build()
         .InitializePipeline();

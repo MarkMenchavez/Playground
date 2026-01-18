@@ -1,5 +1,3 @@
-#pragma warning disable MA0048 // File name must match type name
-
 using System.Text;
 
 using Microsoft.AspNetCore.Builder;
@@ -7,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.AspNetCore;
 
 namespace Playground.Infrastructure;
@@ -30,10 +29,13 @@ public static class EchoServiceCollectionExtensions
     }
 }
 
+internal static class EchoConstants
+{
+    public const string EchoApiFeature = "EchoApi";
+}
+
 internal static class EchoEndpointBuilderExtensions
 {
-    private const string EchoApiFeature = "EchoApi";
-
     public static IEndpointRouteBuilder MapEchoApi(this IEndpointRouteBuilder builder)
     {
         builder.MapPost("/api/echo", async (HttpContext context, ILoggerFactory loggerFactory, CancellationToken cancellationToken) =>
@@ -47,7 +49,7 @@ internal static class EchoEndpointBuilderExtensions
 
             return Results.Text(message, "text/plain", Encoding.UTF8);
         })
-        .WithFeatureGate(EchoApiFeature);
+        .WithFeatureGate(EchoConstants.EchoApiFeature);
 
         return builder;
     }
@@ -63,10 +65,18 @@ internal static partial class EchoApiLogger
         string message);
 }
 
-internal class EchoServiceAgent(HttpClient httpClient) : IEchoServiceAgent
+internal class EchoServiceAgent(
+    HttpClient httpClient,
+    IFeatureManager featureManager)
+    : IEchoServiceAgent
 {
     public async Task<string> EchoAsync(string message, CancellationToken cancellationToken = default)
     {
+        if (!await featureManager.IsEnabledAsync(EchoConstants.EchoApiFeature, cancellationToken))
+        {
+            return string.Empty;
+        }
+
         var content = new StringContent(message, Encoding.UTF8, "text/plain");
 
         var response = await httpClient.PostAsync("/api/echo", content, cancellationToken).ConfigureAwait(false);

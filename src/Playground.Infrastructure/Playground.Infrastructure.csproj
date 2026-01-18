@@ -1,8 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Http" />
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
@@ -20,6 +16,7 @@
     <PackageReference Include="Rebus.RabbitMq" />
     <PackageReference Include="Rebus.Serilog" />
     <PackageReference Include="Rebus.ServiceProvider" />
+    <PackageReference Include="Rebus.SqlServer" />
     <PackageReference Include="Scalar.AspNetCore" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Serilog.AspnetCore" />

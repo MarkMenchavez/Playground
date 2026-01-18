@@ -1,4 +1,29 @@
 {
     "version": "0.2.0",
-    "configurations": []
+    "configurations": [
+        {
+            "name": "Launch API",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/Playground.Api/bin/Debug/net10.0/Playground.Api.dll",
+            "cwd": "${workspaceFolder}/src/Playground.Api",
+            "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "preLaunchTask": "dotnet: build"
+        },
+        {
+            "name": "Launch Worker",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/Playground.Worker/bin/Debug/net10.0/Playground.Worker.dll",
+            "cwd": "${workspaceFolder}/src/Playground.Worker",
+            "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "preLaunchTask": "dotnet: build"
+        }
+    ]
 }
