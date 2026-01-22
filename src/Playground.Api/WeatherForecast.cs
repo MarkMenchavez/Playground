@@ -160,17 +160,17 @@ internal static partial class WeatherForecastLogger
 
 internal class WeatherForecastServiceOptions
 {
-    public int DefaultDays { get; set; } = 7;
+    public int DefaultDays { get; init; } = 7;
 
-    public string[] Summaries { get; set; } = [];
+    public string[] Summaries { get; init; } = [];
 
-    public int GenerationMaxSeconds { get; set; } = 2;
+    public int GenerationMaxSeconds { get; init; } = 2;
 
-    public int GenerationDelayMilliseconds { get; set; } = 10;
+    public int GenerationDelayMilliseconds { get; init; } = 10;
 
-    public int MinimumTemperatureCelsius { get; set; } = -20;
+    public int MinimumTemperatureCelsius { get; init; } = -20;
 
-    public int MaximumTemperatureCelsius { get; set; } = 55;
+    public int MaximumTemperatureCelsius { get; init; } = 55;
 }
 
 internal class WeatherForecastService(

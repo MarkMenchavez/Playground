@@ -27,5 +27,5 @@ public class TypeBasedMap
 {
     public string TypeName { get; init; } = string.Empty;
 
-    public string DestinationAddress { get; set; } = string.Empty;
+    public string DestinationAddress { get; init; } = string.Empty;
 }
