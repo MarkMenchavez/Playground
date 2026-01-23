@@ -192,14 +192,7 @@ public static class RebusExtensions
     {
         transport
             .UseRabbitMqAsOneWayClient(connectionString: connectionString)
-            ////.ClientConnectionName(connectionName: webHostEnvironment.ApplicationName) // Used to work in Rebus.RabbitMQ 9.4.1
-            .CustomizeConnectionFactory(connectionFactory =>
-            {
-                // Workaround -- see https://github.com/rebus-org/Rebus.RabbitMq/issues/135
-                connectionFactory.ClientProvidedName = webHostEnvironment.ApplicationName;
-
-                return connectionFactory;
-            });
+            .SetConnectionName(webHostEnvironment.ApplicationName);
     }
 
     private static void ConfigureTransport(
@@ -214,14 +207,7 @@ public static class RebusExtensions
                 connectionString: connectionString,
                 inputQueueName: $"{rebusOptions.InputQueueName}_{tenant}")
             .ExchangeNames(topicExchangeName: tenant)
-            ////.ClientConnectionName(connectionName: webHostEnvironment.ApplicationName) // Used to work in Rebus.RabbitMQ 9.4.1
-            .CustomizeConnectionFactory(connectionFactory =>
-            {
-                // Workaround -- see https://github.com/rebus-org/Rebus.RabbitMq/issues/135
-                connectionFactory.ClientProvidedName = webHostEnvironment.ApplicationName;
-
-                return connectionFactory;
-            });
+            .SetConnectionName(webHostEnvironment.ApplicationName);
     }
 
     private static void ConfigureTimeoutManager(
