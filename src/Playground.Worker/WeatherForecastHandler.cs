@@ -5,6 +5,7 @@ using Playground.Infrastructure;
 
 using Rebus.Bus;
 using Rebus.Handlers;
+using Rebus.Pipeline;
 using Rebus.Retry.Simple;
 
 namespace Playground.Worker;
@@ -51,10 +52,11 @@ internal static partial class WeatherForecastHandlerLogger
 
     [LoggerMessage(
         Level = LogLevel.Debug,
-        Message = "{EventName} Message Deferred.")]
+        Message = "{EventName} Message Deferred {Attempt} times.")]
     public static partial void MessageDeferred(
         this ILogger<WeatherForecastHandler> logger,
-        string eventName);
+        string eventName,
+        int attempt);
 }
 
 internal class WeatherForecastHandler(
@@ -74,7 +76,9 @@ internal class WeatherForecastHandler(
 
         await Task.Delay(HandlerOptions.ProcessDelayMilliseconds);
 
-        if (RebusOptions.MaxDeliveryAttempts - 1 == 0)
+        var deferCount = MessageContext.Current.GetCurrentDeferCount();
+        if (deferCount < RebusOptions.MaxDeferAttempts + 1 &&
+            HandlerOptions.SimulateErrorOnMaxAttempts)
         {
             throw new InvalidOperationException("An error occurred while processing the weather forecast event.");
         }
@@ -82,11 +86,20 @@ internal class WeatherForecastHandler(
         logger.MessageConsumed(message.GetType().Name);
     }
 
-    public Task Handle(IFailed<WeatherForecastGeneratedEvent> message) =>
-        message.DeferAndRetryAsync(bus, RebusOptions);
+    public async Task Handle(IFailed<WeatherForecastGeneratedEvent> failed)
+    {
+        if (await failed.DeferAndRetryAsync(bus, RebusOptions))
+        {
+            logger.MessageDeferred(
+                failed.Message.GetType().Name,
+                MessageContext.Current.GetCurrentDeferCount() + 1);
+        }
+    }
 }
 
 internal class WeatherForecastHandlerOptions
 {
-    public int ProcessDelayMilliseconds { get; set; } = 500;
+    public int ProcessDelayMilliseconds { get; init; } = 500;
+
+    public bool SimulateErrorOnMaxAttempts { get; init; }
 }

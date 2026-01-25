@@ -9,7 +9,10 @@ namespace Playground.Infrastructure;
 
 public static class IFailedExtensions
 {
-    public static Task DeferAndRetryAsync<TMessage>(this IFailed<TMessage> message, IBus bus, RebusOptions options)
+    public static Task<bool> DeferAndRetryAsync<TMessage>(
+        this IFailed<TMessage> message,
+        IBus bus,
+        RebusOptions options)
     {
         return RebusFailedMessageHandler.HandleAsync(
             message,
@@ -18,30 +21,68 @@ public static class IFailedExtensions
     }
 }
 
-internal static class RebusFailedMessageHandler
+public static class IMessageContextExtensions
 {
-    public static async Task HandleAsync<TMessage>(
-        IFailed<TMessage> message,
-        IBus bus,
-        RebusOptions options)
+    public static int GetCurrentDeferCount(this IMessageContext context)
     {
         var deferCount = 0;
-        if (MessageContext.Current.Headers.TryGetValue(Rebus.Messages.Headers.DeferCount, out var currentDeferCount) &&
+        if (context.Headers.TryGetValue(Rebus.Messages.Headers.DeferCount, out var currentDeferCount) &&
             int.TryParse(currentDeferCount, CultureInfo.InvariantCulture, out var parsedDeferCount))
         {
             deferCount = parsedDeferCount;
         }
 
-        if (deferCount < options.MaxDeferAttempts)
-        {
-            var jitter = (Random.Shared.NextDouble() * 0.2) + 0.9;
-            var delay = TimeSpan.FromSeconds(
-                options.DeferDelaySeconds * (deferCount + 1) * jitter);
+        return deferCount;
+    }
+}
 
-            await bus.Advanced.TransportMessage.Defer(delay);
-            return;
+internal static class RebusFailedMessageHandler
+{
+    internal static async Task<bool> HandleAsync<TMessage>(
+        IFailed<TMessage> message,
+        IBus bus,
+        RebusOptions options)
+    {
+        var context = MessageContext.Current;
+        if (context == null)
+        {
+            return false;
         }
 
-        throw new FailFastException(message.ErrorDescription);
+        var deferCount = context.GetCurrentDeferCount();
+
+        if (deferCount >= options.MaxDeferAttempts)
+        {
+            throw new FailFastException(message.ErrorDescription);
+        }
+
+        var delay = CalculateDelay(deferCount, options);
+
+        await bus.Advanced.TransportMessage.Defer(delay);
+
+        return true;
+    }
+
+    private static TimeSpan CalculateDelay(int deferCount, RebusOptions options)
+    {
+        var minJitter = Math.Min(options.JitterMin, options.JitterMax);
+        var maxJitter = Math.Max(options.JitterMin, options.JitterMax);
+        var jitter = options.UseDefaultJitter
+            ? (Random.Shared.NextDouble() * (maxJitter - minJitter)) + minJitter
+            : 1;
+        jitter = Math.Max(0, jitter);
+
+        var effectiveDeferCount = options.IgnoreDeferCountForBackoff ? 0 : deferCount;
+        var safeBackoff = Math.Clamp(options.RetryBackoffFactor, 0.0, 10.0);
+        var baseDelay = Math.Max(1, options.DeferDelaySeconds);
+        var delaySeconds = options.UseFixedDelay
+            ? baseDelay * jitter
+            : baseDelay * Math.Pow(safeBackoff, effectiveDeferCount) * jitter;
+
+        var minDelay = options.MinDeferDelaySeconds > 0 ? options.MinDeferDelaySeconds : 0;
+        var maxDelay = options.MaxDeferDelaySeconds > 0 ? options.MaxDeferDelaySeconds : 3600;
+        delaySeconds = Math.Clamp(delaySeconds, minDelay, maxDelay);
+
+        return TimeSpan.FromSeconds(delaySeconds);
     }
 }

@@ -16,7 +16,23 @@ public class RebusOptions
 
     public int MaxDeferAttempts { get; init; } = 3;
 
-    public int DeferDelaySeconds { get; init; } = 15;
+    public int DeferDelaySeconds { get; init; } = 5;
+
+    public int MinDeferDelaySeconds { get; init; }
+
+    public int MaxDeferDelaySeconds { get; init; } = 3600;
+
+    public bool UseFixedDelay { get; init; }
+
+    public double RetryBackoffFactor { get; init; } = 1.0;
+
+    public bool IgnoreDeferCountForBackoff { get; init; }
+
+    public bool UseDefaultJitter { get; init; } = true;
+
+    public double JitterMin { get; init; } = 0.9;
+
+    public double JitterMax { get; init; } = 1.1;
 
     public TypeBasedMap[] TypeBasedMaps { get; init; } = [];
 
