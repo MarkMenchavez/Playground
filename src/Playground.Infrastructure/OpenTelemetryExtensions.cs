@@ -23,6 +23,8 @@ internal static partial class OpenTelemetryExtensions
 
     private static readonly Regex InformationSchemaRegex = InformationSchemaOptimizedRegex();
 
+    private static readonly Regex CreateIndexOnTimeoutRegex = CreateIndexOnTimeoutOptimizedRegex();
+
     public static void ConfigureOpenTelemetry(this WebApplicationBuilder builder)
     {
         var telemetryBuilder = builder.Services.AddOpenTelemetry()
@@ -86,7 +88,8 @@ internal static partial class OpenTelemetryExtensions
         return !string.IsNullOrWhiteSpace(sql) &&
             !SelectOneRegex.IsMatch(sql) &&
             !TimeoutPollingTableRegex.IsMatch(sql) &&
-            !InformationSchemaRegex.IsMatch(sql);
+            !InformationSchemaRegex.IsMatch(sql) &&
+            !CreateIndexOnTimeoutRegex.IsMatch(sql);
     }
 
     private static void ConfigureMetricsBuilder(MeterProviderBuilder metrics)
@@ -105,4 +108,7 @@ internal static partial class OpenTelemetryExtensions
 
     [GeneratedRegex(@"FROM\s+INFORMATION_SCHEMA\.TABLES\b", RegexOptions.IgnoreCase, "en-US")]
     private static partial Regex InformationSchemaOptimizedRegex();
+
+    [GeneratedRegex(@"CREATE CLUSTERED INDEX.*ON.*Timeout\b", RegexOptions.IgnoreCase, "en-US")]
+    private static partial Regex CreateIndexOnTimeoutOptimizedRegex();
 }
