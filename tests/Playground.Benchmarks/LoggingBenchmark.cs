@@ -19,9 +19,9 @@ public class LoggingBenchmark
 {
     private ILogger<LoggingBenchmark> logger = null!;
 
-    public string QuickAnimal { get; set; } = "quick brown fox";
+    private string QuickAnimal { get; set; } = "quick brown fox";
 
-    public string LazyAnimal { get; set; } = "lazy dog";
+    private string LazyAnimal { get; set; } = "lazy dog";
 
     [GlobalSetup]
     public void GlobalSetup()
