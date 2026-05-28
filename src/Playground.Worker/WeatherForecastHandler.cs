@@ -26,9 +26,9 @@ public static class HostBuilderExtensions
         return builder;
     }
 
-    private static OptionsBuilder<WeatherForecastHandlerOptions> ConfigureWeatherHandlerOptions(this IServiceCollection services)
+    private static void ConfigureWeatherHandlerOptions(this IServiceCollection services)
     {
-        return services.AddOptions<WeatherForecastHandlerOptions>()
+        services.AddOptions<WeatherForecastHandlerOptions>()
              .Validate(o => o.ProcessDelayMilliseconds >= 1, "ProcessDelayMilliseconds must be zero or a positive integer.")
              .ValidateOnStart();
     }

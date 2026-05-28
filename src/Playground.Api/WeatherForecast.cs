@@ -78,20 +78,18 @@ internal static class ServiceCollectionExtensions
         return services;
     }
 
-    private static IServiceCollection AddWeatherForecast(this IServiceCollection services)
+    private static void AddWeatherForecast(this IServiceCollection services)
     {
         services.AddScoped<IValidator<GetForecastRequest>, GetForecastRequestValidator>();
 
         services.AddEchoServiceAgent();
         services.TryAddTransient<IWeatherForecastService, WeatherForecastService>();
         services.ConfigureWeatherForecastServiceOptions();
-
-        return services;
     }
 
-    private static OptionsBuilder<WeatherForecastServiceOptions> ConfigureWeatherForecastServiceOptions(this IServiceCollection services)
+    private static void ConfigureWeatherForecastServiceOptions(this IServiceCollection services)
     {
-        return services.AddOptions<WeatherForecastServiceOptions>()
+        services.AddOptions<WeatherForecastServiceOptions>()
              .Validate(o => o.DefaultDays > 0, "DefaultDays must be greater than zero.")
              .Validate(o => o.Summaries.Length > 0, "Summaries must contain at least one summary.")
              .Validate(o => o.GenerationMaxSeconds > 0, "GenerationMaxSecond must be greater than zero.")
