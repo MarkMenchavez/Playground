@@ -22,5 +22,11 @@ The solution contains the following key components:
 * **Integration Tests**: Tests that verify interactions between different components of the system.
 * **Performance Tests**: Tests that measure the system's performance under various load conditions.
 
+## Documentation Details
+For detailed architectural design and operational flow, please refer to the following documents:
+* **Architecture:** [Architecture Details](./docs/Architecture.md)
+* **Workflow Example:** [Message Flow Example](./docs/Solution.md)
+
 ## Technologies
 * .NET 10
+
