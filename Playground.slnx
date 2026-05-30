@@ -1,0 +1,16 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/src/">
+    <Project Path="src/Playground.Api/Playground.Api.csproj" />
+    <Project Path="src/Playground.Events/Playground.Events.csproj" />
+    <Project Path="src/Playground.Infrastructure/Playground.Infrastructure.csproj" />
+    <Project Path="src/Playground.Worker/Playground.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Playground.Benchmarks/Playground.Benchmarks.csproj" />
+  </Folder>
+</Solution>
