@@ -1,8 +1,7 @@
 <Solution>
   <Configurations>
     <Platform Name="Any CPU" />
-    <Platform Name="x64" />
-    <Platform Name="x86" />
+    <Platform Name="Linux" />
   </Configurations>
   <Folder Name="/src/">
     <Project Path="src/Playground.Api/Playground.Api.csproj" />
@@ -12,5 +11,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Playground.Benchmarks/Playground.Benchmarks.csproj" />
+    <Project Path="tests/Playground.Infrastructure.UnitTests/Playground.Infrastructure.UnitTests.csproj" />
   </Folder>
 </Solution>
