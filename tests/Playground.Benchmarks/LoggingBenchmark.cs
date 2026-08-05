@@ -17,7 +17,7 @@ namespace Playground.Benchmarks;
 [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
 public class LoggingBenchmark
 {
-    private ILogger<LoggingBenchmark> logger = null!;
+    private ILogger<LoggingBenchmark>? logger = null;
 
     private string QuickAnimal { get; set; } = "quick brown fox";
 
@@ -42,28 +42,28 @@ public class LoggingBenchmark
     [BenchmarkCategory("Structured", "Not Logged")]
     public void StructuredParametersNotLogged()
     {
-        logger.LogDebug("The {QuickAnimal} jumps over the {LazyAnimal}", QuickAnimal, LazyAnimal);
+        logger?.LogDebug("The {QuickAnimal} jumps over the {LazyAnimal}", QuickAnimal, LazyAnimal);
     }
 
     [Benchmark]
     [BenchmarkCategory("Structured", "Logged")]
     public void StructuredParametersLogged()
     {
-        logger.LogInformation("The {QuickAnimal} jumps over the {LazyAnimal}", QuickAnimal, LazyAnimal);
+        logger?.LogInformation("The {QuickAnimal} jumps over the {LazyAnimal}", QuickAnimal, LazyAnimal);
     }
 
     [Benchmark]
     [BenchmarkCategory("Structured", "Not Logged")]
     public void StructuredLoggerMessageNotLogged()
     {
-        logger.DebugQuickLazyAnimal(QuickAnimal, LazyAnimal);
+        logger?.DebugQuickLazyAnimal(QuickAnimal, LazyAnimal);
     }
 
     [Benchmark]
     [BenchmarkCategory("Structured", "Logged")]
     public void StructuredLoggerMessageLogged()
     {
-        logger.InformationQuickLazyAnimal(QuickAnimal, LazyAnimal);
+        logger?.InformationQuickLazyAnimal(QuickAnimal, LazyAnimal);
     }
 
 #pragma warning disable S2629 // Logging templates should be constant
@@ -71,28 +71,28 @@ public class LoggingBenchmark
     [BenchmarkCategory("Unstructured", "Not Logged")]
     public void UnstructuredConcatenationNotLogged()
     {
-        logger.LogDebug("The " + QuickAnimal + " jumps over the " + LazyAnimal);
+        logger?.LogDebug("The " + QuickAnimal + " jumps over the " + LazyAnimal);
     }
 
     [Benchmark]
     [BenchmarkCategory("Unstructured", "Logged")]
     public void UnstructuredConcatenationLogged()
     {
-        logger.LogInformation("The " + QuickAnimal + " jumps over the " + LazyAnimal);
+        logger?.LogInformation("The " + QuickAnimal + " jumps over the " + LazyAnimal);
     }
 
     [Benchmark]
     [BenchmarkCategory("Unstructured", "Not Logged")]
     public void UnstructuredInterpolationNotLogged()
     {
-        logger.LogDebug($"The {QuickAnimal} jumps over the {LazyAnimal}");
+        logger?.LogDebug($"The {QuickAnimal} jumps over the {LazyAnimal}");
     }
 
     [Benchmark]
     [BenchmarkCategory("Unstructured", "Logged")]
     public void UnstructuredInterpolationLogged()
     {
-        logger.LogInformation($"The {QuickAnimal} jumps over the {LazyAnimal}");
+        logger?.LogInformation($"The {QuickAnimal} jumps over the {LazyAnimal}");
     }
 #pragma warning restore S2629 // Logging templates should be constant
 }

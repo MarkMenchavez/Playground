@@ -28,7 +28,7 @@ internal record GetForecastRequest([property: FromQuery(Name = "days")] int Days
             return true;
         }
 
-        result = default!;
+        result = null!;
         return false;
     }
 

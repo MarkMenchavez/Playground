@@ -170,14 +170,16 @@ public static class RebusExtensions
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>();
                 var webHostEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
 
-                var rabbitMQConnectionString = configuration.GetConnectionString(ConnectionStringName.RabbitMQ)!;
-                var sqlServerConnectionString = configuration.GetConnectionString(ConnectionStringName.SQLServer)!;
+                var rabbitMQConnectionString = configuration.GetConnectionString(ConnectionStringName.RabbitMQ)
+                    ?? throw new RebusConfigurationException("No RabbitMQ connection string provided.");
+                var sqlServerConnectionString = configuration.GetConnectionString(ConnectionStringName.SQLServer)
+                    ?? throw new RebusConfigurationException("No SQL Server connection string provided.");
 
                 configurer
                     .Logging(logger => logger.Serilog())
                     .Serialization(serializer => serializer.UseNewtonsoftJson(JsonInteroperabilityMode.PureJson))
                     .Transport(transport => ConfigureTransport(transport, rabbitMQConnectionString, tenant, rebusOptions, webHostEnvironment))
-                    .Timeouts(timeoutManager => ConfigureTimeoutManager(timeoutManager, sqlServerConnectionString, tenant, rebusOptions))
+                    .Timeouts(timeoutManager => ConfigureTimeoutManager(timeoutManager, sqlServerConnectionString!, tenant, rebusOptions))
                     .Routing(router => ConfigureRebusRouting(router, rebusOptions))
                     .Options(options => ConfigureRebusOptions(options, handlerName, tenant, rebusOptions));
 
