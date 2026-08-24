@@ -16,18 +16,16 @@ internal static class OpenApiExtensions
         services.AddApiVersioning(options =>
         {
             options.AssumeDefaultVersionWhenUnspecified = true;
-            options.DefaultApiVersion = ApiVersion.Default;
+            options.DefaultApiVersion = new ApiVersion(1, 0);
             options.ReportApiVersions = true;
         }).AddApiExplorer(options =>
         {
             options.GroupNameFormat = "'v'VVV";
             options.SubstituteApiVersionInUrl = true;
-        });
+            options.ApiVersionParameterSource = new UrlSegmentApiVersionReader();
+        }).AddOpenApi();
 
         services.ConfigureOptions<ConfigureOpenApiOptions>();
-        services.AddOpenApi("v1");
-        services.AddOpenApi("v2");
-        services.AddOpenApi("v3");
 
         return services;
     }
@@ -36,19 +34,18 @@ internal static class OpenApiExtensions
     {
         if (app.Environment.IsDevelopment())
         {
-            var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+            app.MapOpenApi().WithDocumentPerVersion();
 
-            app.MapOpenApi();
             app.MapScalarApiReference(options =>
             {
-                var sorted = provider.ApiVersionDescriptions
+                var descriptions = app.DescribeApiVersions()
                     .OrderByDescending(d => d.ApiVersion.MajorVersion)
                     .ThenByDescending(d => d.ApiVersion.MinorVersion)
                     .ToList();
 
-                foreach (var description in sorted)
+                foreach (var groupName in descriptions.Select(description => description.GroupName))
                 {
-                    options.AddDocument(description.GroupName);
+                    options.AddDocument(groupName, groupName);
                 }
             });
         }
