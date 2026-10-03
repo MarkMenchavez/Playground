@@ -100,15 +100,15 @@ internal static partial class OpenTelemetryExtensions
         metrics.AddRebusInstrumentation();
     }
 
-    [GeneratedRegex(@"^\s*SELECT\s+1\b", RegexOptions.IgnoreCase, "en-US")]
+    [GeneratedRegex(@"^\s*SELECT\s+1\b", RegexOptions.IgnoreCase | RegexOptions.NonBacktracking, "en-US")]
     private static partial Regex SelectOneOptimizedRegex();
 
-    [GeneratedRegex(@"\b(?:FROM|INSERT\s+INTO)\s+(?:\[?\w+\]?\.)?\[?\w*Timeout\w*\]?\b", RegexOptions.IgnoreCase | RegexOptions.Multiline, "en-US")]
+    [GeneratedRegex(@"\b(?:FROM|INSERT\s+INTO)\s+(?:\[?\w+\]?\.)?\[?\w*Timeout\w*\]?\b", RegexOptions.IgnoreCase | RegexOptions.NonBacktracking | RegexOptions.Multiline, "en-US")]
     private static partial Regex TimeoutPollingTableOptimizedRegex();
 
-    [GeneratedRegex(@"FROM\s+INFORMATION_SCHEMA\.TABLES\b", RegexOptions.IgnoreCase, "en-US")]
+    [GeneratedRegex(@"FROM\s+INFORMATION_SCHEMA\.TABLES\b", RegexOptions.IgnoreCase | RegexOptions.NonBacktracking, "en-US")]
     private static partial Regex InformationSchemaOptimizedRegex();
 
-    [GeneratedRegex(@"CREATE CLUSTERED INDEX.*ON.*Timeout\b", RegexOptions.IgnoreCase, "en-US")]
+    [GeneratedRegex(@"CREATE\s+CLUSTERED\s+INDEX\s+.*?\s+ON\s+.*?\bTimeout\b", RegexOptions.IgnoreCase | RegexOptions.NonBacktracking, "en-US")]
     private static partial Regex CreateIndexOnTimeoutOptimizedRegex();
 }
