@@ -15,16 +15,8 @@ using Rebus.OpenTelemetry.Configuration;
 
 namespace Playground.Infrastructure;
 
-internal static partial class OpenTelemetryExtensions
+internal static class OpenTelemetryExtensions
 {
-    private static readonly Regex SelectOneRegex = SelectOneOptimizedRegex();
-
-    private static readonly Regex TimeoutPollingTableRegex = TimeoutPollingTableOptimizedRegex();
-
-    private static readonly Regex InformationSchemaRegex = InformationSchemaOptimizedRegex();
-
-    private static readonly Regex CreateIndexOnTimeoutRegex = CreateIndexOnTimeoutOptimizedRegex();
-
     public static void ConfigureOpenTelemetry(this WebApplicationBuilder builder)
     {
         var telemetryBuilder = builder.Services.AddOpenTelemetry()
@@ -86,10 +78,10 @@ internal static partial class OpenTelemetryExtensions
         var sql = command.CommandText;
 
         return !string.IsNullOrWhiteSpace(sql) &&
-            !SelectOneRegex.IsMatch(sql) &&
-            !TimeoutPollingTableRegex.IsMatch(sql) &&
-            !InformationSchemaRegex.IsMatch(sql) &&
-            !CreateIndexOnTimeoutRegex.IsMatch(sql);
+            !SqlRegex.SelectOneRegex.IsMatch(sql) &&
+            !SqlRegex.TimeoutPollingTableRegex.IsMatch(sql) &&
+            !SqlRegex.InformationSchemaRegex.IsMatch(sql) &&
+            !SqlRegex.CreateIndexOnTimeoutRegex.IsMatch(sql);
     }
 
     private static void ConfigureMetricsBuilder(MeterProviderBuilder metrics)
@@ -99,16 +91,4 @@ internal static partial class OpenTelemetryExtensions
         metrics.AddSqlClientInstrumentation();
         metrics.AddRebusInstrumentation();
     }
-
-    [GeneratedRegex(@"^\s*SELECT\s+1\b", RegexOptions.IgnoreCase | RegexOptions.NonBacktracking, "en-US")]
-    private static partial Regex SelectOneOptimizedRegex();
-
-    [GeneratedRegex(@"\b(?:FROM|INSERT\s+INTO)\s+(?:\[?\w+\]?\.)?\[?\w*Timeout\w*\]?\b", RegexOptions.IgnoreCase | RegexOptions.NonBacktracking | RegexOptions.Multiline, "en-US")]
-    private static partial Regex TimeoutPollingTableOptimizedRegex();
-
-    [GeneratedRegex(@"FROM\s+INFORMATION_SCHEMA\.TABLES\b", RegexOptions.IgnoreCase | RegexOptions.NonBacktracking, "en-US")]
-    private static partial Regex InformationSchemaOptimizedRegex();
-
-    [GeneratedRegex(@"CREATE\s+CLUSTERED\s+INDEX\s+.*?\s+ON\s+.*?\bTimeout\b", RegexOptions.IgnoreCase | RegexOptions.NonBacktracking, "en-US")]
-    private static partial Regex CreateIndexOnTimeoutOptimizedRegex();
 }
